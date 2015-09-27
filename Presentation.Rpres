@@ -1,0 +1,101 @@
+
+Develop Data Products - Project - Visual Aid for Diagnostic Test Interpretation
+========================================================
+author: Luis Espejo
+date: 09/26/2015
+
+Introduction and Background Information
+========================================================
+Diagnostic tests are never perfect. We use sensitivity and specificity to measure how imperfect they are. 
+
+**Sensitivity** (Se) is the conditional probability that an individual tests positive (T+) given that is infected or has the disease is present (D+).  Se = P(T+ | D+)
+
+**Specificity** (Sp) is the conditional probability that an individual tests negative (T-) given that is not infected or does not have the disease (D-). Sp = P(T-| D-)
+The reverse conditional probabilities of the Se and Sp are the Predictive Values. Thus predictive values measure how likely an individual is infected given the prevalence and test results. 
+
+**Positive and Negative Predictive Values** (PPV and NPV, respectively) are the probability of infected given the test results. PPV = P(D+|P+) and NPV = P(D-|T- )
+
+**Prevalence** (P) is the proportion of the population that is infected. P = P(D+)
+
+Objetive and Math
+========================================================
+The objective of this application was to improve the understanding of the diagnostic tests by showing the expected value and the distribution associated. Visual evaluation of the distribution of the Se and Sp aids to the understanding of the risk of implementing an specific diagnostic test. Similarly, understand the association between Se, Sp, P, NPV and PPV help patients to make informed decisions about their health.
+
+![alt text](imagen2.png)
+
+
+Se, Sp and P were modeled using Beta distribution that help to visualize not only the expected value but also the uncertainty of the estimations.
+
+
+
+App Example
+========================================================
+
+```{r, echo=FALSE, out.height="500px",out.width="3000px"}
+set.seed(10)
+muse1 <- 0.5
+varse1 <-0.02
+se11 <- ((1 - muse1) / varse1 - 1 / muse1) * muse1 ^ 2
+se21 <- se11 * (1 / muse1 - 1)
+oneSe <- rbeta(1000000, shape1=se11, shape2=se21)   
+musp1 <- 0.8
+varsp1 <-0.01
+sp11 <- ((1 - musp1) / varsp1 - 1 / musp1) * musp1 ^ 2
+sp21 <- sp11 * (1 / musp1 - 1)
+oneSp <- rbeta(1000000, shape1=sp11, shape2=sp21)
+muP1 <- 0.1
+varP1 <- 0.02
+sP11 <- ((1 - muP1) / varP1 - 1 / muP1) * muP1 ^ 2
+sP21 <- sP11 * (1 / muP1 - 1)
+oneP <- rbeta(1000000, shape1=sP11, shape2=sP21)
+
+muse2 <- 0.8
+varse2 <-0.02
+se12 <- ((1 - muse2) / varse2 - 1 / muse2) * muse2 ^ 2
+se22 <- se12 * (1 / muse2 - 1)
+twoSe <- rbeta(1000000, shape1=se12, shape2=se22)   
+musp2 <- 0.8
+varsp2 <-0.01
+sp12 <- ((1 - musp2) / varsp2 - 1 / musp2) * musp2 ^ 2
+sp22 <- sp12 * (1 / musp2 - 1)
+twoSp <- rbeta(1000000, shape1=sp12, shape2=sp22)
+muP2 <- 0.6
+varP2 <- 0.02
+sP12 <- ((1 - muP2) / varP2 - 1 / muP2) * muP2 ^ 2
+sP22 <- sP12 * (1 / muP2 - 1)
+twoP <- rbeta(1000000, shape1=sP12, shape2=sP22)
+
+par(mfrow=c(1,2))
+onePPV<-(oneSe*oneP)/ ((oneSe*oneP)+((1-oneSp)*(1-oneP))) 
+plot(density(onePPV), lwd=2, ylab = "Density",
+main="Distribution of PPV", xlab = "Positive Predicte Value")
+polygon(density(onePPV), col="green")
+meanPPV1<-mean(onePPV)
+abline(v=meanPPV1, col = "red", lty=1, lwd=2)
+legend("topright", paste(c("Se mean: 50% var: 2%" ,"Sp mean: 80% var: 1%","P mean: 10% var: 2%")), bty="n")
+
+twoPPV<-(twoSe*twoP)/ ((twoSe*twoP)+((1-twoSp)*(1-twoP))) 
+plot(density(twoPPV), lwd=2, ylab = "Density",
+main="Distribution of PPV", xlab = "Positive Predicte Value")
+polygon(density(twoPPV), col="green")
+meantwoPPV<-mean(twoPPV)
+abline(v=meantwoPPV, col = "red", lty=1, lwd=2)
+legend("topleft", paste(c("Se mean: 80% var: 2%" ,"Sp mean: 80% var: 1%","P mean: 60% var: 2%")), bty="n")
+```
+
+In this example, when we held the Sp constant at 80%, we see that individuals with a positive test results (T+) are less likely (~20%) to be infected, if the Se and P are low (50% and 10%, respectively). In contrast individuals with a positive test results are more likely to be infected (~85%), if the Se and P are higher (80% and 60%, respectively).
+
+
+Final Comments
+========================================================
+* I think there is a lot of room to improve the application and this presentation, however my main objective was to accomplish the course project. 
+
+* I think people (and physicians) need to better understand diagnostic tests and the meaning of their results.
+
+* I invite you to play with the application. Understand the effect of different parameters values on the mean (red line) and on the overall shape of the distribution. 
+
+* Also make sure you use realistic means and variances. For example, a mean of 99% and a variance of >2% may result in an error. Beta distribution does not "behave" well at making predictions for their extreme values (0 and 100).  
+
+* Please feel free to contact me if you have any question about this application (lespejos(at)google email).
+
+* The application is available at https://lespejos.shinyapps.io/DDPpoject
